@@ -16,10 +16,13 @@ opt = init_distributed(opt)
 pretrained_pth = 'pretrained/biomed_parse.pt'
 pretrained_pth = 'hf_hub:microsoft/BiomedParse'
 
+print("Loading model from pretrained weights")
 model = BaseModel(opt, build_model(opt)).from_pretrained(pretrained_pth).eval().cuda()
+print("Loaded model")
 with torch.no_grad():
+    print("Generate text embeddings")
     model.model.sem_seg_head.predictor.lang_encoder.get_text_embeddings(BIOMED_CLASSES + ["background"], is_eval=True)
-
+    print("Generated text embeddings")
 
 # Load image and run inference
 # RGB image input of shape (H, W, 3). Currently only batch size 1 is supported.
@@ -35,7 +38,9 @@ for prompt in prompts:
     gt_mask = 1*(np.array(gt_mask.convert('RGB'))[:,:,0] > 0)
     gt_masks.append(gt_mask)
 
+print("Running inference")
 pred_mask = interactive_infer_image(model, image, prompts)
+print("Finished inference")
 
 # prediction with ground truth mask
 for i, pred in enumerate(pred_mask):
