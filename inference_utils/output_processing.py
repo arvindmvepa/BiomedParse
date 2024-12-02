@@ -3,14 +3,13 @@ from scipy import stats
 import numpy as np
 
 
-target_dist = json.load(open("inference_utils/target_dist.json"))
-
 
 def check_mask_stats(img, mask, modality_type, target):
     # img: np.array, shape=(H, W, 3) RGB image with pixel values in [0, 255]
     # mask: np.array, shape=(H, W, 1) mask probability scaled to [0,255] with pixel values in [0, 255]
     # modality_type: str, see target_dist.json for the list of modality types
     # target: str, see target_dist.json for the list of targets
+    target_dist = json.load(open("inference_utils/target_dist.json"))
     
     if modality_type not in target_dist:
         raise ValueError(f"Currently support modality types: {list(target_dist.keys())}")
