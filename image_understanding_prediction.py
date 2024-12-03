@@ -76,7 +76,7 @@ output_folder = 'vqa_rad_ChestX-ray8_output'
 os.makedirs(output_folder, exist_ok=True)
 
 for image_path in full_image_file_paths:
-    image = Image.open(image_path, formats=[image_path[-3:]])
+    image = Image.open(image_path, formats=[image_path[-3:]].lower())
     image = image.convert('RGB')
 
     print("Running inference on", image_path)
