@@ -90,6 +90,7 @@ for image_path in full_image_file_paths:
     print("Transposed pred_mask shape:", pred_mask.shape)
 
     print("pred_mask dtype:", pred_mask.dtype)
+    print("np.unique(pred_mask):", np.unique(pred_mask))
 
     # test 0
     array_2d = np.squeeze(pred_mask)  # Now shape is (1024, 1024)
