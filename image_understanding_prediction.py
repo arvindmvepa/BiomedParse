@@ -117,13 +117,17 @@ for image_path in full_image_file_paths:
         for i in range(pred_mask.shape[2]):
             mask = Image.fromarray(pred_mask[:, :, i].astype(np.uint8))
             mask = mask.resize((rgb_image.shape[1], rgb_image.shape[0]), resample=Image.NEAREST)
-            # debug
-            mask_image = Image.fromarray((mask * 255).astype(np.uint8))
-            mask_image.save(f"mask_{idx}_{prompt}.png")
-            # debug
             pred_mask_resized[:, :, i] = np.array(mask)
         pred_mask = pred_mask_resized
         print("Resized pred_mask to match rgb_image shape.")
+
+    # debug
+    for idx, prompt in enumerate(prompt_list):
+        mask = pred_mask[:, :, idx]
+        print(f"{prompt}: Non-zero pixels: {np.count_nonzero(mask)}")
+        mask_image = Image.fromarray((mask * 255).astype(np.uint8))
+        mask_image.save(f"mask_{idx}_{prompt}.png")
+    # debug
 
     # Create a copy of the original image to draw contours
     contour_image = rgb_image.copy()
