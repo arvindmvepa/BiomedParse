@@ -29,8 +29,12 @@ with torch.no_grad():
     print("Generated text embeddings")
 
 # Text prompts querying objects in the image. Multiple ones can be provided.
+"""
 prompts = BIOMED_CLASSES + list(BIOMED_HIERARCHY['CT'].keys()) + sum(list(BIOMED_HIERARCHY['CT'].values()), []) + \
           ["intracranial hemorrhage", "pulmonary embolism", "fracture", "cardiomegaly", "atelectasis"] + \
+          ["pleural effusion", "pneumothorax", "pneumonia", "mass", "nodule"]
+"""
+prompts = ["intracranial hemorrhage", "pulmonary embolism", "fracture", "cardiomegaly", "atelectasis"] + \
           ["pleural effusion", "pneumothorax", "pneumonia", "mass", "opacity"]
 prompts = list(set(prompts))
 prompts.remove("other")
@@ -39,7 +43,7 @@ print("prompts:", prompts)
 print("Number of prompts:", len(prompts))
 
 # Create an output directory if it doesn't exist
-output_folder = 'output_images'
+output_folder = 'output_images1'
 os.makedirs(output_folder, exist_ok=True)
 
 # Map prompts to indices
