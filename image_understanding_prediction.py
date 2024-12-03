@@ -89,6 +89,21 @@ for image_path in full_image_file_paths:
     pred_mask = pred_mask.transpose(1, 2, 0)  # Now pred_mask.shape == (H, W, N)
     print("Transposed pred_mask shape:", pred_mask.shape)
 
+    # test 0
+    array_2d = np.squeeze(pred_mask)  # Now shape is (1024, 1024)
+
+    # Ensure the array is in uint8 format
+    if array_2d.dtype != np.uint8:
+        # If array values are between 0 and 1, scale them to 0-255
+        array_2d = (array_2d * 255).astype(np.uint8)
+
+    # Optionally, specify the mode (e.g., 'L' for grayscale)
+    image = Image.fromarray(array_2d, mode='L')
+
+    # Save the image
+    image.save('mask_test0.png')
+
+    # test 1
     mask_image = Image.fromarray((np.squeeze(pred_mask)).astype(np.uint8) * 255)
     mask_image.save(f'mask_test1.png')
 
