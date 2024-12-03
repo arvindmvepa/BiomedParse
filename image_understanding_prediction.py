@@ -8,6 +8,7 @@ from utilities.constants import BIOMED_CLASSES, BIOMED_HIERARCHY
 import numpy as np
 import os
 import random
+import cv2
 
 from inference_utils.inference import interactive_infer_image
 
