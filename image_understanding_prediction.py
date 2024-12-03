@@ -89,6 +89,9 @@ for image_path in full_image_file_paths:
     pred_mask = pred_mask.transpose(1, 2, 0)  # Now pred_mask.shape == (H, W, N)
     print("Transposed pred_mask shape:", pred_mask.shape)
 
+    mask_image = Image.fromarray((np.squeeze(pred_mask)).astype(np.uint8) * 255)
+    mask_image.save(f'mask_test1.png')
+
     # Verify that N matches the number of prompts
     if N != len(prompt_list):
         print(f"Warning: Number of channels in pred_mask ({N}) does not match number of prompts ({len(prompt_list)}).")
@@ -114,7 +117,7 @@ for image_path in full_image_file_paths:
         print("Resized pred_mask to match rgb_image shape.")
 
     mask_image = Image.fromarray((np.squeeze(pred_mask)).astype(np.uint8) * 255)
-    mask_image.save(f'mask_test.png')
+    mask_image.save(f'mask_test2.png')
 
     # Create a copy of the original image to draw contours
     contour_image = rgb_image.copy()
