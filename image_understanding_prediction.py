@@ -83,7 +83,7 @@ for image_path in full_image_file_paths:
     # Transpose pred_mask to shape (H, W, N)
     if isinstance(pred_mask, torch.Tensor):
         pred_mask = pred_mask.cpu().numpy()
-        pred_mask = (pred_mask > 0.5).astype(np.float32)
+        pred_mask = np.where(pred_mask > 0.5, 1.0, 0.0)
 
     print("np.unique(pred_mask) 0:", np.unique(pred_mask))
 
