@@ -47,11 +47,11 @@ print("Number of prompts:", len(prompts))
 #prompts = ['tumor', 'nodule', 'opacity']
 #prompts = ['tumor', 'nodule', 'COVID-19 infection']
 #prompts = ['tumor']
+"""
 prompts = ["Atelectasis", "Cardiomegaly", "Effusion", "Infiltration", "Mass", "Nodule", "Pneumonia", "Pneumothorax"]
 """
 prompts = ["Atelectasis", "Cardiomegaly", "Effusion", "Infiltration", "Mass", "Nodule", "Pneumonia", "Pneumothorax",
            "Consolidation", "Edema", "Emphysema", "Fibrosis", "Pleural Thickening", "Hernia"]
-"""
 
 # Map prompts to indices
 prompt_list = prompts
@@ -72,7 +72,7 @@ full_image_file_paths = [os.path.join(image_dir, image_file) for image_file in i
 #full_image_file_paths = ["/local2/amvepa91/BiomedParse/biomedparse_datasets/BiomedParseData-Demo/demo/02_CT_lung.png"]
 
 # Create an output directory if it doesn't exist
-output_folder = 'vqa_rad_ChestX-ray8_output'
+output_folder = 'vqa_rad_ChestX-ray14_output'
 os.makedirs(output_folder, exist_ok=True)
 
 for image_path in full_image_file_paths:
