@@ -33,9 +33,10 @@ with torch.no_grad():
 prompts = BIOMED_CLASSES + list(BIOMED_HIERARCHY['CT'].keys()) + sum(list(BIOMED_HIERARCHY['CT'].values()), []) + \
           ["intracranial hemorrhage", "pulmonary embolism", "fracture", "cardiomegaly", "atelectasis"] + \
           ["pleural effusion", "pneumothorax", "pneumonia", "mass", "nodule"]
-"""
 prompts = ["intracranial hemorrhage", "pulmonary embolism", "cardiomegaly", "atelectasis"] + \
           ["pleural effusion", "pneumothorax", "pneumonia", "mass", "opacity"]
+"""
+prompts = ['tumor', 'nodule', 'opacity']
 prompts = list(set(prompts))
 if "other" in prompts:
     prompts.remove("other")
