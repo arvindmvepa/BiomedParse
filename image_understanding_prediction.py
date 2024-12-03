@@ -70,7 +70,7 @@ for prompt in prompt_list:
 full_image_file_paths = ["/local2/amvepa91/BiomedParse/biomedparse_datasets/BiomedParseData-Demo/demo/02_CT_lung.png"]
 
 for image_path in full_image_file_paths:
-    image = Image.open(image_path)
+    image = Image.open(image_path, formats=[image_path[-3:]])
     image = image.convert('RGB')
 
     print("Running inference on", image_path)
@@ -82,6 +82,7 @@ for image_path in full_image_file_paths:
     # Transpose pred_mask to shape (H, W, N)
     if isinstance(pred_mask, torch.Tensor):
         pred_mask = pred_mask.cpu().numpy()
+        pred_mask = pred_mask > 0.5
 
     N, H, W = pred_mask.shape
     pred_mask = pred_mask.transpose(1, 2, 0)  # Now pred_mask.shape == (H, W, N)
