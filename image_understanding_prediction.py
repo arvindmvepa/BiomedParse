@@ -35,7 +35,8 @@ prompts = BIOMED_CLASSES + list(BIOMED_HIERARCHY['CT'].keys()) + sum(list(BIOMED
 prompts = list(set(prompts))
 prompts.remove("other")
 prompts.remove("panreas")
-print("prompts: ", prompts)
+print("prompts:", prompts)
+print("Number of prompts:", len(prompts))
 
 # Create an output directory if it doesn't exist
 output_folder = 'output_images'
@@ -66,13 +67,24 @@ for image_path in full_image_file_paths:
     print("Predicted mask shape:", pred_mask.shape)
     print("Finished inference")
 
-    # Assuming pred_mask is of shape (H, W, N), where N is the number of prompts
-    # If pred_mask is a tensor, convert it to a NumPy array
+    # Assuming pred_mask is of shape (N, H, W), where N is the number of prompts
+    # Transpose pred_mask to shape (H, W, N)
     if isinstance(pred_mask, torch.Tensor):
         pred_mask = pred_mask.cpu().numpy()
 
-    # Get dimensions
-    H, W, N = pred_mask.shape
+    N, H, W = pred_mask.shape
+    pred_mask = pred_mask.transpose(1, 2, 0)  # Now pred_mask.shape == (H, W, N)
+    print("Transposed pred_mask shape:", pred_mask.shape)
+
+    # Verify that N matches the number of prompts
+    if N != len(prompt_list):
+        print(f"Warning: Number of channels in pred_mask ({N}) does not match number of prompts ({len(prompt_list)}).")
+        # Handle this situation appropriately, e.g., by adjusting prompt_list or pred_mask
+        # For now, let's adjust N to be the minimum of the two
+        min_N = min(N, len(prompt_list))
+        pred_mask = pred_mask[:, :, :min_N]
+        prompt_list = prompt_list[:min_N]
+        print(f"Adjusted pred_mask and prompt_list to have {min_N} prompts.")
 
     # Reshape pred_mask for easier processing
     pred_mask_reshaped = pred_mask.reshape(-1, N)
@@ -91,6 +103,11 @@ for image_path in full_image_file_paths:
     # Map labels to colors (including overlaps)
     label_to_color = {}
     for combination, label in combination_to_label.items():
+        # Ensure indices are within the valid range
+        if any(idx >= len(prompt_list) for idx in combination):
+            print(f"Invalid index in combination {combination}. Skipping.")
+            continue
+
         if len(combination) == 1:
             # Single prompt
             prompt = prompt_list[combination[0]]
@@ -111,6 +128,8 @@ for image_path in full_image_file_paths:
     for label in np.unique(combined_mask):
         if label == 0:
             continue  # Skip background
+        if label not in label_to_color:
+            continue  # Skip labels that were skipped earlier
         mask = combined_mask == label
         overlay[mask] = label_to_color[label]
 
@@ -121,7 +140,9 @@ for image_path in full_image_file_paths:
     # Generate the legend entries
     legend_entries = []
     for combination, label in combination_to_label.items():
-        prompt_names = [prompt_list[idx] for idx in combination]
+        if label not in label_to_color:
+            continue  # Skip labels that were skipped
+        prompt_names = [prompt_list[idx] for idx in combination if idx < len(prompt_list)]
         if len(prompt_names) == 1:
             label_name = prompt_names[0]
         else:
@@ -161,6 +182,7 @@ for image_path in full_image_file_paths:
     combined_image.paste(legend_image, (blended_width, 0))
 
     # Save the combined image
-    output_path = os.path.join(output_folder, os.path.basename(image_path))
+    output_filename = os.path.splitext(os.path.basename(image_path))[0] + '_overlay.jpg'
+    output_path = os.path.join(output_folder, output_filename)
     combined_image.save(output_path, 'JPEG')
     print(f"Saved output image to {output_path}")
