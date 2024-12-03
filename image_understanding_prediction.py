@@ -36,7 +36,8 @@ prompts = BIOMED_CLASSES + list(BIOMED_HIERARCHY['CT'].keys()) + sum(list(BIOMED
 prompts = ["intracranial hemorrhage", "pulmonary embolism", "cardiomegaly", "atelectasis"] + \
           ["pleural effusion", "pneumothorax", "pneumonia", "mass", "opacity"]
 """
-prompts = ['tumor', 'nodule', 'opacity']
+#prompts = ['tumor', 'nodule', 'opacity']
+prompts = ['tumor', 'nodule', 'COVID-19 infection']
 prompts = list(set(prompts))
 if "other" in prompts:
     prompts.remove("other")
@@ -61,9 +62,11 @@ for prompt in prompt_list:
 
 # Load image and run inference
 # RGB image input of shape (H, W, 3). Currently only batch size 1 is supported.
-image_dir = '/local2/shared_data/VQA-RAD/images'
-image_files = sorted(list(os.listdir(image_dir)))
-full_image_file_paths = [os.path.join(image_dir, image_file) for image_file in image_files]
+
+#image_dir = '/local2/shared_data/VQA-RAD/images'
+#image_files = sorted(list(os.listdir(image_dir)))
+#full_image_file_paths = [os.path.join(image_dir, image_file) for image_file in image_files]
+full_image_file_paths = ["/local2/amvepa91/BiomedParse/examples/covid_1585.png"]
 
 for image_path in full_image_file_paths:
     image = Image.open(image_path)
