@@ -113,6 +113,9 @@ for image_path in full_image_file_paths:
         pred_mask = pred_mask_resized
         print("Resized pred_mask to match rgb_image shape.")
 
+    mask_image = Image.fromarray((np.squeeze(pred_mask)).astype(np.uint8) * 255)
+    mask_image.save(f'mask_test.png')
+
     # Create a copy of the original image to draw contours
     contour_image = rgb_image.copy()
 
