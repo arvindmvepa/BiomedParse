@@ -48,7 +48,7 @@ print("prompts:", prompts)
 print("Number of prompts:", len(prompts))
 
 # Create an output directory if it doesn't exist
-output_folder = 'output_images3'
+output_folder = 'output_images4'
 os.makedirs(output_folder, exist_ok=True)
 
 # Map prompts to indices
@@ -84,104 +84,51 @@ for image_path in full_image_file_paths:
         pred_mask = pred_mask.cpu().numpy()
         pred_mask = pred_mask > 0.5
 
-    # should be the same here
     N, H, W = pred_mask.shape
     pred_mask = pred_mask.transpose(1, 2, 0)  # Now pred_mask.shape == (H, W, N)
     print("Transposed pred_mask shape:", pred_mask.shape)
 
-    """
     # Verify that N matches the number of prompts
     if N != len(prompt_list):
         print(f"Warning: Number of channels in pred_mask ({N}) does not match number of prompts ({len(prompt_list)}).")
-        # Handle this situation appropriately
+        # Adjust N and prompt_list accordingly
         min_N = min(N, len(prompt_list))
         pred_mask = pred_mask[:, :, :min_N]
         prompt_list = prompt_list[:min_N]
         print(f"Adjusted pred_mask and prompt_list to have {min_N} prompts.")
 
-    # Reshape pred_mask for easier processing
-    pred_mask_reshaped = pred_mask.reshape(-1, N)
-
-    # For each pixel, get the active prompts
-    active_prompts_array = [tuple(np.where(pixel > 0)[0]) for pixel in pred_mask_reshaped]
-
-    # Map unique combinations to labels, assign label 0 to background (empty combination)
-    unique_combinations = set(active_prompts_array)
-    combination_to_label = {}
-    label_counter = 1
-    for combination in unique_combinations:
-        if len(combination) == 0:
-            combination_to_label[combination] = 0  # Background label
-        else:
-            combination_to_label[combination] = label_counter
-            label_counter += 1
-
-    # Create combined_mask where each unique combination has a unique label
-    combined_mask_flat = np.array([combination_to_label[combination] for combination in active_prompts_array])
-    combined_mask = combined_mask_flat.reshape(H, W)
-
-    # Map labels to colors (including overlaps)
-    label_to_color = {}
-    for combination, label in combination_to_label.items():
-        if label == 0:
-            continue  # Skip background
-        # Ensure indices are within the valid range
-        if any(idx >= len(prompt_list) for idx in combination):
-            print(f"Invalid index in combination {combination}. Skipping.")
-            continue
-
-        if len(combination) == 1:
-            # Single prompt
-            prompt = prompt_list[combination[0]]
-            label_to_color[label] = color_map[prompt]
-        else:
-            # Overlapping prompts: average their colors
-            colors = np.array([color_map[prompt_list[idx]] for idx in combination])
-            if colors.size == 0:
-                print(f"No colors found for combination {combination}. Skipping.")
-                continue
-            mixed_color = tuple(np.mean(colors, axis=0).astype(np.uint8))
-            label_to_color[label] = mixed_color
-    # Convert the original image to a NumPy array
+    # Resize pred_mask to match the original image size if necessary
     rgb_image = np.array(image)
-    print("rgb_image shape:", rgb_image.shape)  # Added print statement
-    print("combined_mask shape before resizing:", combined_mask.shape)  # Added print statement
+    print("rgb_image shape:", rgb_image.shape)
+    print("pred_mask shape before resizing:", pred_mask.shape)
 
-    # Resize combined_mask to match rgb_image dimensions
-    combined_mask_image = Image.fromarray(combined_mask.astype(np.uint8))
-    combined_mask_resized = combined_mask_image.resize((rgb_image.shape[1], rgb_image.shape[0]), resample=Image.NEAREST)
-    combined_mask_resized = np.array(combined_mask_resized)
-    print("combined_mask shape after resizing:", combined_mask_resized.shape)  # Added print statement
+    if pred_mask.shape[0] != rgb_image.shape[0] or pred_mask.shape[1] != rgb_image.shape[1]:
+        # Resize pred_mask
+        pred_mask_resized = np.zeros((rgb_image.shape[0], rgb_image.shape[1], pred_mask.shape[2]), dtype=pred_mask.dtype)
+        for i in range(pred_mask.shape[2]):
+            mask = Image.fromarray(pred_mask[:, :, i].astype(np.uint8))
+            mask = mask.resize((rgb_image.shape[1], rgb_image.shape[0]), resample=Image.NEAREST)
+            pred_mask_resized[:, :, i] = np.array(mask)
+        pred_mask = pred_mask_resized
+        print("Resized pred_mask to match rgb_image shape.")
 
-    # Create an overlay image
-    overlay = np.zeros_like(rgb_image)
+    # Create a copy of the original image to draw contours
+    contour_image = rgb_image.copy()
 
-    # Apply colors to the overlay based on the combined_mask_resized
-    for label in np.unique(combined_mask_resized):
-        if label == 0:
-            continue  # Skip background
-        if label not in label_to_color:
-            continue  # Skip labels that were skipped earlier
-        mask = combined_mask_resized == label
-        overlay[mask] = label_to_color[label]
-
-    # Blend the overlay with the original image
-    alpha = 0.5  # Transparency factor
-    blended = (rgb_image * (1 - alpha) + overlay * alpha).astype(np.uint8)
+    # For each prompt/mask, extract contours and draw them
+    for idx in range(pred_mask.shape[2]):
+        mask = pred_mask[:, :, idx].astype(np.uint8)
+        prompt = prompt_list[idx]
+        color = color_map[prompt]
+        # Find contours using OpenCV
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        # Draw contours on the image
+        cv2.drawContours(contour_image, contours, -1, color, thickness=2)
 
     # Generate the legend entries
     legend_entries = []
-    for combination, label in combination_to_label.items():
-        if label == 0:
-            continue  # Skip background
-        if label not in label_to_color:
-            continue  # Skip labels that were skipped
-        prompt_names = [prompt_list[idx] for idx in combination if idx < len(prompt_list)]
-        if len(prompt_names) == 1:
-            label_name = prompt_names[0]
-        else:
-            label_name = ' & '.join(prompt_names)
-        legend_entries.append((label_name, label_to_color[label]))
+    for idx, prompt in enumerate(prompt_list):
+        legend_entries.append((prompt, color_map[prompt]))
 
     # Create the legend image
     legend_height = 20 * len(legend_entries) + 10
@@ -202,35 +149,21 @@ for image_path in full_image_file_paths:
         # Draw text
         draw.text((35, y), label_name, fill='black', font=font)
 
-    # Combine the blended image and the legend
-    blended_image = Image.fromarray(blended)
-    blended_width, blended_height = blended_image.size
+    # Combine the contour image and the legend
+    contour_pil_image = Image.fromarray(contour_image)
+    contour_width, contour_height = contour_pil_image.size
 
-    # Create a new image that can hold both the blended image and the legend
-    total_width = blended_width + legend_width
-    total_height = max(blended_height, legend_height)
+    # Create a new image that can hold both the contour image and the legend
+    total_width = contour_width + legend_width
+    total_height = max(contour_height, legend_height)
     combined_image = Image.new('RGB', (total_width, total_height), color='white')
 
-    # Paste the blended image and the legend into the combined image
-    combined_image.paste(blended_image, (0, 0))
-    combined_image.paste(legend_image, (blended_width, 0))
+    # Paste the contour image and the legend into the combined image
+    combined_image.paste(contour_pil_image, (0, 0))
+    combined_image.paste(legend_image, (contour_width, 0))
 
     # Save the combined image
-    output_filename = os.path.splitext(os.path.basename(image_path))[0] + '_overlay.jpg'
+    output_filename = os.path.splitext(os.path.basename(image_path))[0] + '_contours.jpg'
     output_path = os.path.join(output_folder, output_filename)
     combined_image.save(output_path, 'JPEG')
     print(f"Saved output image to {output_path}")
-    """
-    # Remove the singleton dimension
-    array_2d = np.squeeze(pred_mask)  # Now shape is (1024, 1024)
-
-    # Ensure the array is in uint8 format
-    if array_2d.dtype != np.uint8:
-        # If array values are between 0 and 1, scale them to 0-255
-        array_2d = (array_2d * 255).astype(np.uint8)
-
-    # Optionally, specify the mode (e.g., 'L' for grayscale)
-    image = Image.fromarray(array_2d, mode='L')
-
-    # Save the image
-    image.save('output_image.png')
