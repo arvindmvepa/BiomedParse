@@ -143,13 +143,13 @@ for image_path in full_image_file_paths:
     # Create an overlay image
     overlay = np.zeros_like(rgb_image)
 
-    # Apply colors to the overlay based on the combined_mask
-    for label in np.unique(combined_mask):
+    # Apply colors to the overlay based on the combined_mask_resized
+    for label in np.unique(combined_mask_resized):
         if label == 0:
             continue  # Skip background
         if label not in label_to_color:
             continue  # Skip labels that were skipped earlier
-        mask = combined_mask == label
+        mask = combined_mask_resized == label
         overlay[mask] = label_to_color[label]
 
     # Blend the overlay with the original image
