@@ -46,7 +46,7 @@ print("prompts:", prompts)
 print("Number of prompts:", len(prompts))
 
 # Create an output directory if it doesn't exist
-output_folder = 'output_images2'
+output_folder = 'output_images3'
 os.makedirs(output_folder, exist_ok=True)
 
 # Map prompts to indices
