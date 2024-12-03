@@ -135,6 +135,10 @@ for image_path in full_image_file_paths:
     # Create an overlay image
     overlay = np.zeros_like(rgb_image)
 
+    print(overlay.shape)
+    print(len(label_to_color.keys()))
+    print([color.shape for color in label_to_color.values()])
+
     # Apply colors to the overlay based on the combined_mask
     for label in np.unique(combined_mask):
         if label == 0:
