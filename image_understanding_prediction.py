@@ -37,7 +37,8 @@ prompts = ["intracranial hemorrhage", "pulmonary embolism", "cardiomegaly", "ate
           ["pleural effusion", "pneumothorax", "pneumonia", "mass", "opacity"]
 """
 #prompts = ['tumor', 'nodule', 'opacity']
-prompts = ['tumor', 'nodule', 'COVID-19 infection']
+#prompts = ['tumor', 'nodule', 'COVID-19 infection']
+prompts = ['tumor']
 prompts = list(set(prompts))
 if "other" in prompts:
     prompts.remove("other")
@@ -66,7 +67,7 @@ for prompt in prompt_list:
 #image_dir = '/local2/shared_data/VQA-RAD/images'
 #image_files = sorted(list(os.listdir(image_dir)))
 #full_image_file_paths = [os.path.join(image_dir, image_file) for image_file in image_files]
-full_image_file_paths = ["/local2/amvepa91/BiomedParse/examples/covid_1585.png"]
+full_image_file_paths = ["/local2/amvepa91/BiomedParse/biomedparse_datasets/BiomedParseData-Demo/demo_mask/02_CT_lung.png"]
 
 for image_path in full_image_file_paths:
     image = Image.open(image_path)
