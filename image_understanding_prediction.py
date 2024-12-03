@@ -85,12 +85,14 @@ for image_path in full_image_file_paths:
         pred_mask = pred_mask.cpu().numpy()
         pred_mask = (pred_mask > 0.5).astype(np.float32)
 
+    print("np.unique(pred_mask) 0:", np.unique(pred_mask))
+
     N, H, W = pred_mask.shape
     pred_mask = pred_mask.transpose(1, 2, 0)  # Now pred_mask.shape == (H, W, N)
     print("Transposed pred_mask shape:", pred_mask.shape)
 
     print("pred_mask dtype:", pred_mask.dtype)
-    print("np.unique(pred_mask):", np.unique(pred_mask))
+    print("np.unique(pred_mask) 1:", np.unique(pred_mask))
 
     # test 0
     array_2d = np.squeeze(pred_mask)  # Now shape is (1024, 1024)
