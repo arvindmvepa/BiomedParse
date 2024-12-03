@@ -36,10 +36,6 @@ prompts = BIOMED_CLASSES + list(BIOMED_HIERARCHY['CT'].keys()) + sum(list(BIOMED
           ["pleural effusion", "pneumothorax", "pneumonia", "mass", "nodule"]
 prompts = ["intracranial hemorrhage", "pulmonary embolism", "cardiomegaly", "atelectasis"] + \
           ["pleural effusion", "pneumothorax", "pneumonia", "mass", "opacity"]
-"""
-#prompts = ['tumor', 'nodule', 'opacity']
-#prompts = ['tumor', 'nodule', 'COVID-19 infection']
-prompts = ['tumor']
 prompts = list(set(prompts))
 if "other" in prompts:
     prompts.remove("other")
@@ -47,10 +43,15 @@ if "panreas" in prompts:
     prompts.remove("panreas")
 print("prompts:", prompts)
 print("Number of prompts:", len(prompts))
-
-# Create an output directory if it doesn't exist
-output_folder = 'output_images4'
-os.makedirs(output_folder, exist_ok=True)
+"""
+#prompts = ['tumor', 'nodule', 'opacity']
+#prompts = ['tumor', 'nodule', 'COVID-19 infection']
+#prompts = ['tumor']
+prompts = ["Atelectasis", "Cardiomegaly", "Effusion", "Infiltration", "Mass", "Nodule", "Pneumonia", "Pneumothorax"]
+"""
+prompts = ["Atelectasis", "Cardiomegaly", "Effusion", "Infiltration", "Mass", "Nodule", "Pneumonia", "Pneumothorax",
+           "Consolidation", "Edema", "Emphysema", "Fibrosis", "Pleural Thickening", "Hernia"]
+"""
 
 # Map prompts to indices
 prompt_list = prompts
@@ -65,10 +66,14 @@ for prompt in prompt_list:
 # Load image and run inference
 # RGB image input of shape (H, W, 3). Currently only batch size 1 is supported.
 
-#image_dir = '/local2/shared_data/VQA-RAD/images'
-#image_files = sorted(list(os.listdir(image_dir)))
-#full_image_file_paths = [os.path.join(image_dir, image_file) for image_file in image_files]
-full_image_file_paths = ["/local2/amvepa91/BiomedParse/biomedparse_datasets/BiomedParseData-Demo/demo/02_CT_lung.png"]
+image_dir = '/local2/shared_data/VQA-RAD/images'
+image_files = sorted(list(os.listdir(image_dir)))
+full_image_file_paths = [os.path.join(image_dir, image_file) for image_file in image_files]
+#full_image_file_paths = ["/local2/amvepa91/BiomedParse/biomedparse_datasets/BiomedParseData-Demo/demo/02_CT_lung.png"]
+
+# Create an output directory if it doesn't exist
+output_folder = 'vqa_rad_ChestX-ray8_output'
+os.makedirs(output_folder, exist_ok=True)
 
 for image_path in full_image_file_paths:
     image = Image.open(image_path, formats=[image_path[-3:]])
