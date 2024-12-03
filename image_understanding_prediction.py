@@ -171,5 +171,6 @@ for image_path in full_image_file_paths:
     """
     output_filename = os.path.splitext(os.path.basename(image_path))[0] + '_contours1.jpg'
     output_path = os.path.join(output_folder, output_filename)
-    contour_image.save(output_path, 'JPEG')
+    contour_pil_image = Image.fromarray(contour_image)
+    contour_pil_image.save(output_path, 'JPEG')
     print(f"Saved output image to {output_path}")
