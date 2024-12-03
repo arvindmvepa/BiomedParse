@@ -61,7 +61,10 @@ prompt_to_index = {prompt: idx for idx, prompt in enumerate(prompt_list)}
 color_map = {}
 random.seed(42)  # For reproducibility
 for prompt in prompt_list:
-    color_map[prompt] = tuple(random.randint(0, 255) for _ in range(3))
+    prompt_color = tuple(random.randint(0, 255) for _ in range(3))
+    while prompt_color in color_map.values():
+        prompt_color = tuple(random.randint(0, 255) for _ in range(3))
+    color_map[prompt] = prompt_color
 
 # Load image and run inference
 # RGB image input of shape (H, W, 3). Currently only batch size 1 is supported.
