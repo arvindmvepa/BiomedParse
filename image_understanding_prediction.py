@@ -79,8 +79,7 @@ for image_path in full_image_file_paths:
     # Verify that N matches the number of prompts
     if N != len(prompt_list):
         print(f"Warning: Number of channels in pred_mask ({N}) does not match number of prompts ({len(prompt_list)}).")
-        # Handle this situation appropriately, e.g., by adjusting prompt_list or pred_mask
-        # For now, let's adjust N to be the minimum of the two
+        # Handle this situation appropriately
         min_N = min(N, len(prompt_list))
         pred_mask = pred_mask[:, :, :min_N]
         prompt_list = prompt_list[:min_N]
@@ -92,9 +91,16 @@ for image_path in full_image_file_paths:
     # For each pixel, get the active prompts
     active_prompts_array = [tuple(np.where(pixel > 0)[0]) for pixel in pred_mask_reshaped]
 
-    # Map unique combinations to labels
-    unique_combinations = list(set(active_prompts_array))
-    combination_to_label = {combination: idx + 1 for idx, combination in enumerate(unique_combinations)}  # Start labels from 1
+    # Map unique combinations to labels, assign label 0 to background (empty combination)
+    unique_combinations = set(active_prompts_array)
+    combination_to_label = {}
+    label_counter = 1
+    for combination in unique_combinations:
+        if len(combination) == 0:
+            combination_to_label[combination] = 0  # Background label
+        else:
+            combination_to_label[combination] = label_counter
+            label_counter += 1
 
     # Create combined_mask where each unique combination has a unique label
     combined_mask_flat = np.array([combination_to_label[combination] for combination in active_prompts_array])
@@ -103,6 +109,8 @@ for image_path in full_image_file_paths:
     # Map labels to colors (including overlaps)
     label_to_color = {}
     for combination, label in combination_to_label.items():
+        if label == 0:
+            continue  # Skip background
         # Ensure indices are within the valid range
         if any(idx >= len(prompt_list) for idx in combination):
             print(f"Invalid index in combination {combination}. Skipping.")
@@ -115,6 +123,9 @@ for image_path in full_image_file_paths:
         else:
             # Overlapping prompts: average their colors
             colors = np.array([color_map[prompt_list[idx]] for idx in combination])
+            if colors.size == 0:
+                print(f"No colors found for combination {combination}. Skipping.")
+                continue
             mixed_color = tuple(np.mean(colors, axis=0).astype(np.uint8))
             label_to_color[label] = mixed_color
 
@@ -140,6 +151,8 @@ for image_path in full_image_file_paths:
     # Generate the legend entries
     legend_entries = []
     for combination, label in combination_to_label.items():
+        if label == 0:
+            continue  # Skip background
         if label not in label_to_color:
             continue  # Skip labels that were skipped
         prompt_names = [prompt_list[idx] for idx in combination if idx < len(prompt_list)]
