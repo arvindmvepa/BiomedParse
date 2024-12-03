@@ -51,7 +51,7 @@ print("Number of prompts:", len(prompts))
 prompts = ["Atelectasis", "Cardiomegaly", "Effusion", "Infiltration", "Mass", "Nodule", "Pneumonia", "Pneumothorax"]
 """
 prompts = ["Atelectasis", "Cardiomegaly", "Effusion", "Infiltration", "Mass", "Nodule", "Pneumonia", "Pneumothorax",
-           "Consolidation", "Edema", "Emphysema", "Fibrosis", "Hernia", "Pleural Thickening"]
+           "Consolidation", "Edema", "Emphysema", "Fibrosis", "Pleural Thickening", "Hernia"]
 
 # Map prompts to indices
 prompt_list = prompts
@@ -117,6 +117,10 @@ for image_path in full_image_file_paths:
         for i in range(pred_mask.shape[2]):
             mask = Image.fromarray(pred_mask[:, :, i].astype(np.uint8))
             mask = mask.resize((rgb_image.shape[1], rgb_image.shape[0]), resample=Image.NEAREST)
+            # debug
+            mask_image = Image.fromarray((mask * 255).astype(np.uint8))
+            mask_image.save(f"mask_{idx}_{prompt}.png")
+            # debug
             pred_mask_resized[:, :, i] = np.array(mask)
         pred_mask = pred_mask_resized
         print("Resized pred_mask to match rgb_image shape.")
@@ -133,6 +137,10 @@ for image_path in full_image_file_paths:
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         # Draw contours on the image
         cv2.drawContours(contour_image, contours, -1, color, thickness=2)
+        # debug
+        intermediate_image = Image.fromarray(contour_image)
+        intermediate_image.save(f"contour_debug_{idx}_{prompt}.png")
+        # debug
 
     # Generate the legend entries
     legend_entries = []
@@ -176,3 +184,6 @@ for image_path in full_image_file_paths:
     output_path = os.path.join(output_folder, output_filename)
     combined_image.save(output_path, 'JPEG')
     print(f"Saved output image to {output_path}")
+    # debug
+    break
+    # debug
