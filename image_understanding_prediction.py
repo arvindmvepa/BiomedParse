@@ -34,7 +34,7 @@ prompts = BIOMED_CLASSES + list(BIOMED_HIERARCHY['CT'].keys()) + sum(list(BIOMED
           ["intracranial hemorrhage", "pulmonary embolism", "fracture", "cardiomegaly", "atelectasis"] + \
           ["pleural effusion", "pneumothorax", "pneumonia", "mass", "nodule"]
 """
-prompts = ["intracranial hemorrhage", "pulmonary embolism", "fracture", "cardiomegaly", "atelectasis"] + \
+prompts = ["intracranial hemorrhage", "pulmonary embolism", "cardiomegaly", "atelectasis"] + \
           ["pleural effusion", "pneumothorax", "pneumonia", "mass", "opacity"]
 prompts = list(set(prompts))
 if "other" in prompts:
@@ -45,7 +45,7 @@ print("prompts:", prompts)
 print("Number of prompts:", len(prompts))
 
 # Create an output directory if it doesn't exist
-output_folder = 'output_images1'
+output_folder = 'output_images2'
 os.makedirs(output_folder, exist_ok=True)
 
 # Map prompts to indices
