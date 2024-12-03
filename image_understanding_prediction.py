@@ -125,7 +125,7 @@ for image_path in full_image_file_paths:
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         # Draw contours on the image
         cv2.drawContours(contour_image, contours, -1, color, thickness=2)
-
+    """
     # Generate the legend entries
     legend_entries = []
     for idx, prompt in enumerate(prompt_list):
@@ -167,4 +167,9 @@ for image_path in full_image_file_paths:
     output_filename = os.path.splitext(os.path.basename(image_path))[0] + '_contours.jpg'
     output_path = os.path.join(output_folder, output_filename)
     combined_image.save(output_path, 'JPEG')
+    print(f"Saved output image to {output_path}")
+    """
+    output_filename = os.path.splitext(os.path.basename(image_path))[0] + '_contours1.jpg'
+    output_path = os.path.join(output_folder, output_filename)
+    contour_image.save(output_path, 'JPEG')
     print(f"Saved output image to {output_path}")
