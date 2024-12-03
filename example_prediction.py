@@ -26,7 +26,7 @@ with torch.no_grad():
 
 # Load image and run inference
 # RGB image input of shape (H, W, 3). Currently only batch size 1 is supported.
-image = Image.open('biomedparse_datasets/BiomedParseData-Demo/demo/02_CT_lung_tumor.png', formats=['png'])
+image = Image.open('biomedparse_datasets/BiomedParseData-Demo/demo/02_CT_lung.png', formats=['png'])
 image = image.convert('RGB')
 # text prompts querying objects in the image. Multiple ones can be provided.
 prompts = ['tumor']
@@ -34,7 +34,7 @@ prompts = ['tumor']
 # load ground truth mask
 gt_masks = []
 for prompt in prompts:
-    gt_mask = Image.open(f"biomedparse_datasets/BiomedParseData-Demo/demo_mask/02_CT_lung_tumor_{prompt.replace(' ', '+')}.png", formats=['png'])
+    gt_mask = Image.open(f"biomedparse_datasets/BiomedParseData-Demo/demo_mask/02_CT_lung_{prompt.replace(' ', '+')}.png", formats=['png'])
     gt_mask = 1*(np.array(gt_mask.convert('RGB'))[:,:,0] > 0)
     gt_masks.append(gt_mask)
 
