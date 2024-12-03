@@ -51,7 +51,7 @@ print("Number of prompts:", len(prompts))
 prompts = ["Atelectasis", "Cardiomegaly", "Effusion", "Infiltration", "Mass", "Nodule", "Pneumonia", "Pneumothorax"]
 """
 prompts = ["Atelectasis", "Cardiomegaly", "Effusion", "Infiltration", "Mass", "Nodule", "Pneumonia", "Pneumothorax",
-           "Consolidation", "Edema", "Emphysema", "Fibrosis", "Pleural Thickening", "Hernia"]
+           "Consolidation", "Edema", "Emphysema", "Fibrosis", "Hernia", "Pleural Thickening"]
 
 # Map prompts to indices
 prompt_list = prompts
