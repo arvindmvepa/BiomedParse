@@ -37,8 +37,10 @@ prompts = BIOMED_CLASSES + list(BIOMED_HIERARCHY['CT'].keys()) + sum(list(BIOMED
 prompts = ["intracranial hemorrhage", "pulmonary embolism", "fracture", "cardiomegaly", "atelectasis"] + \
           ["pleural effusion", "pneumothorax", "pneumonia", "mass", "opacity"]
 prompts = list(set(prompts))
-prompts.remove("other")
-prompts.remove("panreas")
+if "other" in prompts:
+    prompts.remove("other")
+if "panreas" in prompts:
+    prompts.remove("panreas")
 print("prompts:", prompts)
 print("Number of prompts:", len(prompts))
 
