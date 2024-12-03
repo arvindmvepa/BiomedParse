@@ -79,38 +79,15 @@ for image_path in full_image_file_paths:
     print("Predicted mask shape:", pred_mask.shape)
     print("Finished inference")
 
-    # Assuming pred_mask is of shape (N, H, W), where N is the number of prompts
-    # Transpose pred_mask to shape (H, W, N)
     if isinstance(pred_mask, torch.Tensor):
         pred_mask = pred_mask.cpu().numpy()
+
     pred_mask = np.where(pred_mask > 0.5, 1, 0)
-    print("np.unique(pred_mask) 0:", np.unique(pred_mask))
+    print("np.unique(pred_mask):", np.unique(pred_mask))
 
     N, H, W = pred_mask.shape
     pred_mask = pred_mask.transpose(1, 2, 0)  # Now pred_mask.shape == (H, W, N)
     print("Transposed pred_mask shape:", pred_mask.shape)
-
-    print("pred_mask dtype:", pred_mask.dtype)
-    print("np.unique(pred_mask) 1:", np.unique(pred_mask))
-
-    # test 0
-    array_2d = np.squeeze(pred_mask)  # Now shape is (1024, 1024)
-
-    # Ensure the array is in uint8 format
-    if array_2d.dtype != np.uint8:
-        print("Converting array to uint8 format.")
-        # If array values are between 0 and 1, scale them to 0-255
-        array_2d = (array_2d * 255).astype(np.uint8)
-
-    # Optionally, specify the mode (e.g., 'L' for grayscale)
-    image = Image.fromarray(array_2d, mode='L')
-
-    # Save the image
-    image.save('mask_test0.png')
-
-    # test 1
-    mask_image = Image.fromarray((np.squeeze(pred_mask)).astype(np.uint8) * 255)
-    mask_image.save(f'mask_test1.png')
 
     # Verify that N matches the number of prompts
     if N != len(prompt_list):
@@ -135,9 +112,6 @@ for image_path in full_image_file_paths:
             pred_mask_resized[:, :, i] = np.array(mask)
         pred_mask = pred_mask_resized
         print("Resized pred_mask to match rgb_image shape.")
-
-    mask_image = Image.fromarray((np.squeeze(pred_mask)).astype(np.uint8) * 255)
-    mask_image.save(f'mask_test2.png')
 
     # Create a copy of the original image to draw contours
     contour_image = rgb_image.copy()
@@ -195,7 +169,7 @@ for image_path in full_image_file_paths:
     combined_image.save(output_path, 'JPEG')
     print(f"Saved output image to {output_path}")
     """
-    output_filename = os.path.splitext(os.path.basename(image_path))[0] + '_contours1.jpg'
+    output_filename = os.path.splitext(os.path.basename(image_path))[0] + '_contours2.jpg'
     output_path = os.path.join(output_folder, output_filename)
     contour_pil_image = Image.fromarray(contour_image)
     contour_pil_image.save(output_path, 'JPEG')
