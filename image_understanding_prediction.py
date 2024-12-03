@@ -131,13 +131,17 @@ for image_path in full_image_file_paths:
 
     # Convert the original image to a NumPy array
     rgb_image = np.array(image)
+    print("rgb_image shape:", rgb_image.shape)  # Added print statement
+    print("combined_mask shape before resizing:", combined_mask.shape)  # Added print statement
+
+    # Resize combined_mask to match rgb_image dimensions
+    combined_mask_image = Image.fromarray(combined_mask.astype(np.uint8))
+    combined_mask_resized = combined_mask_image.resize((rgb_image.shape[1], rgb_image.shape[0]), resample=Image.NEAREST)
+    combined_mask_resized = np.array(combined_mask_resized)
+    print("combined_mask shape after resizing:", combined_mask_resized.shape)  # Added print statement
 
     # Create an overlay image
     overlay = np.zeros_like(rgb_image)
-
-    print(overlay.shape)
-    print(len(label_to_color.keys()))
-    print([color.shape for color in label_to_color.values()])
 
     # Apply colors to the overlay based on the combined_mask
     for label in np.unique(combined_mask):
