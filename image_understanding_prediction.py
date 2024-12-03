@@ -82,9 +82,8 @@ for image_path in full_image_file_paths:
     # Assuming pred_mask is of shape (N, H, W), where N is the number of prompts
     # Transpose pred_mask to shape (H, W, N)
     if isinstance(pred_mask, torch.Tensor):
-        pred_mask = pred_mask.float().cpu().numpy()
-        pred_mask = np.where(pred_mask > 0.5, 1, 0)
-
+        pred_mask = pred_mask.cpu().numpy()
+    pred_mask = np.where(pred_mask > 0.5, 1, 0)
     print("np.unique(pred_mask) 0:", np.unique(pred_mask))
 
     N, H, W = pred_mask.shape
