@@ -84,10 +84,12 @@ for image_path in full_image_file_paths:
         pred_mask = pred_mask.cpu().numpy()
         pred_mask = pred_mask > 0.5
 
+    # should be the same here
     N, H, W = pred_mask.shape
     pred_mask = pred_mask.transpose(1, 2, 0)  # Now pred_mask.shape == (H, W, N)
     print("Transposed pred_mask shape:", pred_mask.shape)
 
+    """
     # Verify that N matches the number of prompts
     if N != len(prompt_list):
         print(f"Warning: Number of channels in pred_mask ({N}) does not match number of prompts ({len(prompt_list)}).")
@@ -140,7 +142,6 @@ for image_path in full_image_file_paths:
                 continue
             mixed_color = tuple(np.mean(colors, axis=0).astype(np.uint8))
             label_to_color[label] = mixed_color
-
     # Convert the original image to a NumPy array
     rgb_image = np.array(image)
     print("rgb_image shape:", rgb_image.shape)  # Added print statement
@@ -219,3 +220,17 @@ for image_path in full_image_file_paths:
     output_path = os.path.join(output_folder, output_filename)
     combined_image.save(output_path, 'JPEG')
     print(f"Saved output image to {output_path}")
+    """
+    # Remove the singleton dimension
+    array_2d = np.squeeze(pred_mask)  # Now shape is (1024, 1024)
+
+    # Ensure the array is in uint8 format
+    if array_2d.dtype != np.uint8:
+        # If array values are between 0 and 1, scale them to 0-255
+        array_2d = (array_2d * 255).astype(np.uint8)
+
+    # Optionally, specify the mode (e.g., 'L' for grayscale)
+    image = Image.fromarray(array_2d, mode='L')
+
+    # Save the image
+    image.save('output_image.png')
